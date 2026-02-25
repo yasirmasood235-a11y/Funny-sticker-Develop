@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StickerMaster - Meme & Sticker Creator</title>
+    <!-- Tailwind CSS for Styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fabric.js for Canvas Manipulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Impact&family=Comic+Neue:wght@700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background-color: #111827; /* Dark Gray */
+            color: white;
+        }
+        .canvas-container {
+            background-image: 
+                linear-gradient(45deg, #2a2a2a 25%, transparent 25%), 
+                linear-gradient(-45deg, #2a2a2a 25%, transparent 25%), 
+                linear-gradient(45deg, transparent 75%, #2a2a2a 75%), 
+                linear-gradient(-45deg, transparent 75%, #2a2a2a 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="bg-gray-900 border-b border-gray-700 p-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-yellow-400 tracking-wider">STICKER<span class="text-white">MASTER</span> 🐸</h1>
+        <button onclick="downloadSticker()" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded-full transition transform hover:scale-105">
+            Download PNG
+        </button>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Tools -->
+        <aside class="w-80 bg-gray-800 p-6 flex flex-col gap-6 overflow-y-auto border-r border-gray-700 z-10">
+            
+            <!-- Upload Section -->
+            <div class="bg-gray-700 p-4 rounded-lg text-center">
+                <label class="block mb-2 text-sm font-bold text-gray-300">Upload Image</label>
+                <input type="file" id="imgLoader" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-yellow-500 file:text-white hover:file:bg-yellow-600 cursor-pointer"/>
+            </div>
+
+            <!-- Text Tools -->
+            <div class="space-y-3">
+                <h3 class="text-sm font-bold text-gray-400 uppercase">Text & Captions</h3>
+                <div class="flex gap-2">
+                    <input type="text" id="textInput" placeholder="Type here..." class="w-full p-2 rounded bg-gray-900 border border-gray-600 focus:outline-none focus:border-yellow-500">
+                    <button onclick="addText()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded font-bold">+</button>
+                </div>
+                <div class="flex gap-2 mt-2">
+                    <button onclick="changeColor('#FFFFFF')" class="w-8 h-8 rounded-full bg-white border-2 border-gray-500"></button>
+                    <button onclick="changeColor('#000000')" class="w-8 h-8 rounded-full bg-black border-2 border-gray-500"></button>
+                    <button onclick="changeColor('#FF0000')" class="w-8 h-8 rounded-full bg-red-500 border-2 border-gray-500"></button>
+                    <button onclick="changeColor('#FFFF00')" class="w-8 h-8 rounded-full bg-yellow-400 border-2 border-gray-500"></button>
+                </div>
+            </div>
+
+            <!-- Asset Library (Emojis/Overlays) -->
+            <div class="space-y-3">
+                <h3 class="text-sm font-bold text-gray-400 uppercase">Trending Assets</h3>
+                <div class="grid grid-cols-4 gap-2">
+                    <!-- Funny Emojis/Images -->
+                    <button onclick="addEmoji('😎')" class="text-2xl hover:bg-gray-600 p-2 rounded">😎</button>
+                    <button onclick="addEmoji('🤡')" class="text-2xl hover:bg-gray-600 p-2 rounded">🤡</button>
+                    <button onclick="addEmoji('🔥')" class="text-2xl hover:bg-gray-600 p-2 rounded">🔥</button>
+                    <button onclick="addEmoji('💀')" class="text-2xl hover:bg-gray-600 p-2 rounded">💀</button>
+                    <button onclick="addEmoji('👁️')" class="text-2xl hover:bg-gray-600 p-2 rounded">👁️</button>
+                    <button onclick="addEmoji('👄')" class="text-2xl hover:bg-gray-600 p-2 rounded">👄</button>
+                    <button onclick="addEmoji('💩')" class="text-2xl hover:bg-gray-600 p-2 rounded">💩</button>
+                    <button onclick="addEmoji('🤠')" class="text-2xl hover:bg-gray-600 p-2 rounded">🤠</button>
+                </div>
+            </div>
+
+            <!-- Canvas Controls -->
+            <div class="space-y-3 mt-auto">
+                <h3 class="text-sm font-bold text-gray-400 uppercase">Edit</h3>
+                <button onclick="deleteObject()" class="w-full bg-red-600 hover:bg-red-500 text-white py-2 rounded font-bold">Delete Selected</button>
+                <button onclick="bringToFront()" class="w-full bg-gray-600 hover:bg-gray-500 text-white py-2 rounded">Bring to Front</button>
+                <button onclick="sendToBack()" class="w-full bg-gray-600 hover:bg-gray-500 text-white py-2 rounded">Send to Back</button>
+            </div>
+        </aside>
+
+        <!-- Canvas Area -->
+        <main class="flex-1 bg-gray-800 flex justify-center items-center p-8 relative">
+            <div class="canvas-container border-2 border-dashed border-gray-600 rounded-lg">
+                <canvas id="c"></canvas>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
